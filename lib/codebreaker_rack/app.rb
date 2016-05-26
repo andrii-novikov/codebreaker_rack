@@ -23,6 +23,7 @@ module Codebreaker_rack
         when '/game/scores' then scores
         else error404
       end
+      response['Content-Type'] = 'text/html'
       response
     end
 
@@ -53,9 +54,12 @@ module Codebreaker_rack
     def to_game
       if game.nil?
         response.redirect('/game/new')
-      else
-        return game_over unless game.in_play?
+      elsif game.in_play?
         response.write(render('app/game',{game:game}))
+      elsif request.post?
+        game_over
+      else
+        response.redirect('/game/scores')
       end
     end
 
@@ -89,7 +93,8 @@ module Codebreaker_rack
 
     private
 
-    def render(template, data = {}, with_layout = true)
+    def render(template, data = {})
+      with_layout = !request.post?
       page = Codebreaker_rack::Page.new(template, data)
       with_layout ? page.render : page.render_body
     end

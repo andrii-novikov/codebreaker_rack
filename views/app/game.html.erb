@@ -8,7 +8,7 @@
       <div class="row input-group">
         <input type="text" name='guess' class="form-control" placeholder="Enter a four-digit code. Digits must be 1 to 6">
         <div class="input-group-btn">
-          <button class="btn btn-primary" type="button" name="hint">Hint</button>
+          <button class="btn btn-primary" type="button" name="hint" <%if @game.hints < 1%>disabled<%end%>>Hint</button>
           <button class="btn btn-success" type="button" name="check">Go!</button>
         </div>
       </div>

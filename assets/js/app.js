@@ -1,26 +1,42 @@
 App = {
+    initialize: function (e) {
+        App.Game.initialize();
+        App.Main.initialize();
+        App.Over.initialize();
+    },
+    setElements: function () {
+        $.each(this.elements, function (key, val) {
+            this[key]=$(val);
+        }.bind(this));
+    },
     Game: {
-        initialize: function () {
-            $('input[name=guess]').select();
-            $('[name=hint]').click(this.hint);
-            $('[name=check]').click(this.checkGuess);
-            $('[name=guess]').keydown(this.onGuessDown);
-            $('[name=guess]').keyup(this.onGuessUp);
+        elements: {
+            body: '.container.body',
+            inptGuess: 'input[name=guess]',
+            btnCheck: '[name=check]',
+            btnHint: '[name=hint]'
         },
+        initialize: function () {
+            App.setElements.bind(this)();
+            this.inptGuess.select().keydown(this.onGuessDown).keyup(this.onGuessUp);
+            this.btnHint.click(this.hint.bind(this));
+            this.btnCheck.click(this.checkGuess.bind(this));
+        },
+
         checkGuess: function () {
-            var guess = $('input[name=guess]').val();
-            if (App.Game.test(guess)) {
+            var guess = this.inptGuess.val();
+            if (this.test(guess)) {
                 $.ajax({
                     url: '/game/check',
                     method: 'POST',
-                    data: {guess: guess}
+                    data: {guess: guess},
+                    context: this
                 }).done(function (resp) {
-                    $('.container.body').html(resp);
-                    App.Game.initialize();
-                    App.Over.initialize();
+                    this.body.html(resp);
+                    App.initialize();
                 });
             } else {
-               alert('Guess must have 4 numbers from 1 to 6','warning')
+               alert('Guess must have 4 numbers from 1 to 6');
             }
         },
         onGuessDown: function (e) {
@@ -39,17 +55,26 @@ App = {
         },
         hint: function (e) {
             $.ajax({
-                url: '/game/hint'
-            }).done(function (resp) {
-                $('.container.body').html(resp);
-                App.Game.initialize();
-                App.Over.initialize();
-            });
+                url: '/game/hint',
+                method: 'POST',
+                context:this
+            }).done(this.onDone);
+        },
+        onDone: function (resp) {
+            this.body.html(resp);
+            App.initialize();
         }
     },
     Main: {
+        elements: {
+            btnPlay: '#play',
+            name: '[name=name]',
+            hint: ['name=hint']
+        },
         initialize: function () {
-            $('#play').click(this.play);
+            App.setElements.bind(this)();
+            this.btnPlay.click(this.play);
+            this.name.select();
         },
         play: function (e) {
             e.preventDefault();
@@ -57,14 +82,18 @@ App = {
             if (this.form.name.value.trim().length > 1) {
                 this.form.submit()
             } else {
-                $('[name=hint]').text('Name must have 2 or more simbols');
+                this.hint.text('Name must have 2 or more simbols');
                 this.form.name.select()
             }
         }
     },
     Over: {
+        elements: {
+            btnQuestion: '.question button'
+        },
         initialize: function () {
-            $('.question button').click(this.answer)
+            App.setElements.bind(this)();
+            this.btnQuestion.click(this.answer)
         },
         answer: function (e) {
             var btn = $(this),
@@ -95,8 +124,4 @@ App = {
     }
 };
 
-$(document).ready(function () {
-    App.Game.initialize();
-    App.Main.initialize();
-    App.Over.initialize();
-});
+$(document).ready(App.initialize);
