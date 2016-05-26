@@ -1,8 +1,6 @@
 module Codebreaker_rack
   class App
 
-    include Render
-
     def self.call(env)
       request = Rack::Request.new(env)
       App.new(request).response
@@ -36,11 +34,11 @@ module Codebreaker_rack
     end
 
     def actionIndex
-      Rack::Response.new([render('index')])
+      Rack::Response.new(Page.new('app/index',{game:game}))
     end
 
     def action404
-      Rack::Response.new([render('404')],404)
+      Rack::Response.new([Page.new('app/404',{game:game})],404)
     end
 
     def actionNewGame
@@ -62,14 +60,13 @@ module Codebreaker_rack
         response.redirect('/')
       else
         return game_over unless game.in_play?
-        response.write(render('game',binding))
+        response.write(Page.new('app/game',{game:game}).to_str)
       end
       response
     end
 
     def actionHint
-      message = render_body('/app/game/hint',binding)
-      Rack::Response.new([message])
+      Rack::Response.new(Page.new('/app/game/hint',{game:game}).render_body)
     end
 
     def actionCheck
@@ -78,7 +75,7 @@ module Codebreaker_rack
         answer = try_code
         answer = 'Nothing matched:(' if answer.empty?
         return game_over(true) unless game.status == :play
-        response.write(render_body('app/game',binding))
+        response.write(Page.new('/app/game',{game:game,answer:answer}).render_body)
       else
         response.status = 400
       end
@@ -86,7 +83,7 @@ module Codebreaker_rack
     end
 
     def game_over(ajax = false)
-      result = ajax ? render_body('app/game/over',binding) : render('app/game/over',binding)
+      result = ajax ? Page.new('/app/game/over',{game:game}).render_body : Page.new('/app/game/hint',{game:game})
       Rack::Response.new([result])
     end
 
@@ -98,7 +95,7 @@ module Codebreaker_rack
       scores = game.score.split("\n").map! {|line| line.split("\t")}
       scores.shift
       scores.sort_by!(&:last).reverse!
-      Rack::Response.new(render('app/game/score', binding))
+      Rack::Response.new(Page.new('/app/game/score',{scores:scores,game:game}))
     end
 
     private

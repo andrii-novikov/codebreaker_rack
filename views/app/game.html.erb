@@ -1,9 +1,9 @@
 <div class="row text-center">
-  <h1>Let's go, <%=game.name.capitalize%> </h1>
+  <h1>Let's go, <%=@game.name.capitalize%> </h1>
 </div>
 <div class="row">
   <div class="bg-info status">
-    <p>You have <%=game.hints%> hints and <%=game.attempts%> attempts left.</p>
+    <p>You have <%=@game.hints%> hints and <%=@game.attempts%> attempts left.</p>
   </div>
   <div class="input-group">
       <span class="input-group-btn">
@@ -14,9 +14,9 @@
         <button class="btn btn-success" type="button" name="check">Go!</button>
       </span>
   </div>
-  <%if local_variables.include?(:answer)%>
+  <%if instance_variable_defined?(:@answer)%>
       <div class="status bg-success">
-        <%=answer%>
+        <%=@answer%>
       </div>
   <%end%>
 

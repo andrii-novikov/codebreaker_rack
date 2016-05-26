@@ -1,19 +1,19 @@
 <div class="text-center row">
-  <h2>You <%=game.status%>!</h2>
+  <h2>You <%=@game.status%>!</h2>
 </div>
 <div class="questions">
   <div class="question panel panel-info">
     <div class="panel-heading">Do you want save result?</div>
     <div class="panel-body">
-      <button value='yes' data-url="/game/save" class=" btn btn-success">Yes</button>
+      <button value='yes' data-url="/@game/save" class=" btn btn-success">Yes</button>
       <button value='no' class="btn btn-danger">No</button>
     </div>
   </div>
   <div class="question panel panel-info">
     <div class="panel-heading">Do you want play again?</div>
     <div class="panel-body">
-      <button value='yes' data-url="/game/new" data-action="location" class=" btn btn-success">Yes</button>
-      <button value='no' data-url="/game/scores" data-action="location" class="btn btn-danger">No</button>
+      <button value='yes' data-url="/@@game/new" data-action="location" class=" btn btn-success">Yes</button>
+      <button value='no' data-url="/@@game/scores" data-action="location" class="btn btn-danger">No</button>
     </div>
   </div>
 </div>

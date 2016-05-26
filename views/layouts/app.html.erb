@@ -17,15 +17,27 @@
   <div class="header clearfix">
     <nav>
       <ul class="nav nav-pills pull-right">
-        <li role="presentation" class="active"><a href="/">Home</a></li>
-        <% if game %>
-            <% if game.name %>
-              <li role="presentation"><a href="/game/new">New Game</a></li>
+        <li role="presentation" <%if page=='index'%>class="active"<%end%>>
+          <a href="/">Home</a>
+        </li>
+        <% if @game %>
+            <% if @game.name%>
+              <li role="presentation">
+                <a href="/game/new">New Game</a>
+              </li>
             <%end%>
-            <% if game.in_play? %>
-              <li role="presentation"><a href="/game">Continue Game</a></li>
+            <% if @game.in_play?%>
+              <li role="presentation" <%if page=='game'%>class="active"<%end%> >
+                <a href="/game">
+                  <%if page!='game'%>
+                      Continue
+                  <%end%> Game
+                </a>
+              </li>
             <%end%>
-            <li role="presentation"><a href="/game/scores">Scores</a></li>
+            <li role="presentation" <%if page=='game/score'%>class="active"<%end%>>
+              <a href="/game/scores">Scores</a>
+            </li>
         <% end %>
       </ul>
     </nav>

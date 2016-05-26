@@ -1,11 +1,8 @@
 require 'bundler'
 Bundler.require
-# require 'codebreaker'
-# require 'codebreaker/game'
-require_relative 'codebreaker_rack/render'
+
 require_relative 'codebreaker_rack/app'
-require 'erb'
+require_relative 'codebreaker_rack/page'
 
 module Codebreaker_rack
-
 end
