@@ -2,106 +2,110 @@ module Codebreaker_rack
   class App
 
     def self.call(env)
-      request = Rack::Request.new(env)
-      App.new(request).response
+      App.new(env).router
     end
 
-    attr_reader :request
+    attr_reader :request, :response
 
-    def initialize(req)
-      @request = req
+    def initialize(env)
+      @request = Rack::Request.new(env)
+      @response = Rack::Response.new
     end
 
-    def response
+    def router
       case request.path
-        when '/'
-          actionIndex
-        when '/game/new'
-          actionNewGame
-        when '/game'
-          actionGame
-        when '/game/hint'
-          actionHint
-        when '/game/check'
-          actionCheck
-        when '/game/save'
-          actionGameSave
-        when '/game/scores'
-          actionGameScore
-        else
-          action404
+        when '/' then index
+        when '/game/new' then new_game
+        when '/game' then to_game
+        when '/game/hint' then hint
+        when '/game/check' then check
+        when '/game/save' then save_game
+        when '/game/scores' then scores
+        else error404
       end
+      response
     end
 
-    def actionIndex
-      Rack::Response.new(Page.new('app/index',{game:game}))
+    def index
+      response.write( render('app/index',{game:game}))
     end
 
-    def action404
-      Rack::Response.new([Page.new('app/404',{game:game})],404)
+    def error404
+      response.write(render('app/404'))
+      response.status = 404
     end
 
-    def actionNewGame
-      response = Rack::Response.new
-      request.session[:name] = request.POST['name'] if request.POST['name']
-      if request.session[:name].nil?
+    def bad_request
+      response.write('400 Bad Request')
+      response.status = 400
+    end
+
+    def new_game
+      if name.nil?
         response.redirect('/')
       else
-        request.session[:game] = Codebreaker::Game.new(request.session[:name])
+        request.session[:game] = Codebreaker::Game.new(name)
         game.start
         response.redirect('/game')
       end
-      response
     end
 
-    def actionGame
-      response = Rack::Response.new
+    def to_game
       if game.nil?
-        response.redirect('/')
+        response.redirect('/game/new')
       else
         return game_over unless game.in_play?
-        response.write(Page.new('app/game',{game:game}).to_str)
+        response.write(render('app/game',{game:game}))
       end
-      response
     end
 
-    def actionHint
-      Rack::Response.new(Page.new('/app/game/hint',{game:game}).render_body)
+    def hint
+      hint = game.hint
+      response.write(render('/app/game/hint',{game:game, hint: hint},false))
     end
 
-    def actionCheck
-      response = Rack::Response.new
-      if request.post?
-        answer = try_code
-        answer = 'Nothing matched:(' if answer.empty?
-        return game_over(true) unless game.status == :play
-        response.write(Page.new('/app/game',{game:game,answer:answer}).render_body)
-      else
-        response.status = 400
-      end
-      response.finish
+    def check
+      return bad_request unless request.post?
+      answer = try_code
+      return game_over unless game.in_play?
+      response.write(render('/app/game',{game:game,answer:answer}, false))
     end
 
-    def game_over(ajax = false)
-      result = ajax ? Page.new('/app/game/over',{game:game}).render_body : Page.new('/app/game/hint',{game:game})
-      Rack::Response.new([result])
+    def game_over
+      result = render('/app/game/over',{game:game})
+      response.write(result)
     end
 
-    def actionGameSave
+    def save_game
       game.save
     end
 
-    def actionGameScore
+    def scores
       scores = game.score.split("\n").map! {|line| line.split("\t")}
       scores.shift
       scores.sort_by!(&:last).reverse!
-      Rack::Response.new(Page.new('/app/game/score',{scores:scores,game:game}))
+      scores = scores[0...10]
+      response.write(render('/app/game/score',{scores:scores,game:game}))
     end
 
     private
 
+    def render(template, data = {}, with_layout = true)
+      page = Codebreaker_rack::Page.new(template, data)
+      with_layout ? page.render : page.render_body
+    end
+
     def game
       request.session[:game]
+    end
+
+    def name
+      request.session[:name] = request.POST['name'] if new_name?
+      request.session[:name]
+    end
+
+    def new_name?
+      request.POST['name']  && request.POST['name'] != request.session[:name]
     end
 
     def try_code

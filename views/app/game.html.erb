@@ -16,7 +16,11 @@
   </div>
   <%if instance_variable_defined?(:@answer)%>
       <div class="status bg-success">
-        <%=@answer%>
+        <% if @answer.empty? %>
+            Sorry, but nothing matched
+        <%else%>
+            <%=@answer%>
+        <%end%>
       </div>
   <%end%>
 
