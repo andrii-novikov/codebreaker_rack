@@ -6,7 +6,6 @@ App = {
             $('[name=check]').click(this.checkGuess);
             $('[name=guess]').keydown(this.onGuessDown);
             $('[name=guess]').keyup(this.onGuessUp);
-            $('.message').hide();
         },
         checkGuess: function () {
             var guess = $('input[name=guess]').val();
@@ -21,7 +20,7 @@ App = {
                     App.Over.initialize();
                 });
             } else {
-                App.Game.message('Guess must have 4 numbers from 1 to 6','warning')
+               alert('Guess must have 4 numbers from 1 to 6','warning')
             }
         },
         onGuessDown: function (e) {
@@ -42,21 +41,10 @@ App = {
             $.ajax({
                 url: '/game/hint'
             }).done(function (resp) {
-                App.Game.message(resp)
+                $('.container.body').html(resp);
+                App.Game.initialize();
+                App.Over.initialize();
             });
-        },
-        message: function (message, type) {
-            $('.message').hide();
-            if (!$.isEmptyObject(message)) {
-                var types = ['info', 'success', 'warning'];
-                if (types.indexOf(type) < 0) {
-                    type = 'info';
-                }
-
-                var container = $('.message.bg-'+type);
-                container.html(message);
-                container.slideDown();
-            }
         }
     },
     Main: {

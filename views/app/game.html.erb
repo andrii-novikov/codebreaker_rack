@@ -1,30 +1,42 @@
 <div class="row text-center">
-  <h1>Let's go, <%=@game.name.capitalize%> </h1>
+  <h1>Let's go, <%= @game.name.capitalize %> </h1>
 </div>
-<div class="row">
-  <div class="bg-info status">
-    <p>You have <%=@game.hints%> hints and <%=@game.attempts%> attempts left.</p>
-  </div>
-  <div class="input-group">
-      <span class="input-group-btn">
-        <button class="btn btn-primary" type="button" name="hint">Hint</button>
-      </span>
-    <input type="text" name='guess' class="form-control" placeholder="Your guess">
-      <span class="input-group-btn">
-        <button class="btn btn-success" type="button" name="check">Go!</button>
-      </span>
-  </div>
-  <%if instance_variable_defined?(:@answer)%>
-      <div class="status bg-success">
-        <% if @answer.empty? %>
-            Sorry, but nothing matched
-        <%else%>
-            <%=@answer%>
-        <%end%>
-      </div>
-  <%end%>
 
-  <div class="message bg-success"></div>
-  <div class="message bg-info"></div>
-  <div class="message bg-warning"></div>
+<div class="row game-wrap">
+  <div class="col-sm-8 col-md-6 game-left">
+    <div class="middle">
+      <div class="row input-group">
+        <input type="text" name='guess' class="form-control" placeholder="Enter a four-digit code. Digits must be 1 to 6">
+        <div class="input-group-btn">
+          <button class="btn btn-primary" type="button" name="hint">Hint</button>
+          <button class="btn btn-success" type="button" name="check">Go!</button>
+        </div>
+      </div>
+      <div class="row text-center game-info">
+        Attempts left: <b><%= @game.attempts %></b><br>
+        Hints left: <b><%= @game.hints %> </b>
+        <% if instance_variable_defined? :@hint %>
+            <br>Hint: <b><%= @hint %></b>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 game-history">
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>Guess</th>
+        <th>Answer</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @game.history.each do |row| %>
+          <tr>
+            <td><%= row[0] %></td>
+            <td><%= row[1] %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
 </div>

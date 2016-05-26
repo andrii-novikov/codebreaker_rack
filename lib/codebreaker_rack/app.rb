@@ -60,8 +60,7 @@ module Codebreaker_rack
     end
 
     def hint
-      hint = game.hint
-      response.write(render('/app/game/hint',{game:game, hint: hint},false))
+      response.write(render('/app/game',{game:game, hint: game.hint},false))
     end
 
     def check
