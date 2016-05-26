@@ -1,0 +1,13 @@
+<div class="row text-center">
+  <h1>Welcome to Codebreaker</h1>
+  <h2>Enter your name and lets go!</h2>
+  <div class="col-sm-8 col-sm-push-2">
+    <form action="/game/new" method="post">
+      <div class="form-group text-left">
+        <input class="form-control" placeholder="Введите ваше имя" type="text" name="name">
+        <span name='hint' class="help-block"></span>
+      </div>
+      <button id='play' type="submit" class="btn btn-success">Играть!</button>
+    </form>
+  </div>
+</div>

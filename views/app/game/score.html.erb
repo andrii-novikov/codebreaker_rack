@@ -1,0 +1,26 @@
+<div class="text-center row">
+  <h2>Scores</h2>
+</div>
+
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th>#</th>
+    <th>Name</th>
+    <th>Attempts</th>
+    <th>Hints</th>
+    <th>Status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <%scores.each_with_index do |score, i|%>
+      <tr>
+        <th><%= i %></th>
+        <th><%=score[0]%></th>
+        <th><%=score[1]%></th>
+        <th><%=score[2]%></th>
+        <th><%=score[3]%></th>
+      </tr>
+  <%end%>
+  </tbody>
+</table>

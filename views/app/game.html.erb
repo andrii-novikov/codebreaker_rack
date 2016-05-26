@@ -1,0 +1,26 @@
+<div class="row text-center">
+  <h1>Let's go, <%=game.name.capitalize%> </h1>
+</div>
+<div class="row">
+  <div class="bg-info status">
+    <p>You have <%=game.hints%> hints and <%=game.attempts%> attempts left.</p>
+  </div>
+  <div class="input-group">
+      <span class="input-group-btn">
+        <button class="btn btn-primary" type="button" name="hint">Hint</button>
+      </span>
+    <input type="text" name='guess' class="form-control" placeholder="Your guess">
+      <span class="input-group-btn">
+        <button class="btn btn-success" type="button" name="check">Go!</button>
+      </span>
+  </div>
+  <%if local_variables.include?(:answer)%>
+      <div class="status bg-success">
+        <%=answer%>
+      </div>
+  <%end%>
+
+  <div class="message bg-success"></div>
+  <div class="message bg-info"></div>
+  <div class="message bg-warning"></div>
+</div>
