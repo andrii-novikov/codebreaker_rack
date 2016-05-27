@@ -5,11 +5,13 @@ module Codebreaker_rack
       App.new(env).router
     end
 
-    attr_reader :request, :response
+    attr_reader :request, :response, :game
 
     def initialize(env)
       @request = Rack::Request.new(env)
       @response = Rack::Response.new
+      @game = Codebreaker::Game.new
+      load
     end
 
     def router
@@ -23,6 +25,7 @@ module Codebreaker_rack
         when '/game/scores' then scores
         else error404
       end
+      save
       response['Content-Type'] = 'text/html'
       response
     end
@@ -45,7 +48,7 @@ module Codebreaker_rack
       if name.nil?
         response.redirect('/')
       else
-        request.session[:game] = Codebreaker::Game.new(name)
+        game.name = name
         game.start
         response.redirect('/game')
       end
@@ -64,23 +67,19 @@ module Codebreaker_rack
     end
 
     def hint
-      response.write(render('/app/game',{game:game, hint: game.hint},false))
+      response.write(render('/app/game',{game:game, hint: game.hint}))
     end
 
     def check
       return bad_request unless request.post?
       answer = try_code
       return game_over unless game.in_play?
-      response.write(render('/app/game',{game:game,answer:answer}, false))
+      response.write(render('/app/game',{game:game,answer:answer}))
     end
 
     def game_over
       result = render('/app/game/over',{game:game})
       response.write(result)
-    end
-
-    def save_game
-      game.save
     end
 
     def scores
@@ -99,10 +98,6 @@ module Codebreaker_rack
       with_layout ? page.render : page.render_body
     end
 
-    def game
-      request.session[:game]
-    end
-
     def name
       request.session[:name] = request.POST['name'] if new_name?
       request.session[:name]
@@ -116,6 +111,25 @@ module Codebreaker_rack
       game.check(request.POST['guess'])
     rescue => e
       e.message
+    end
+
+    def load
+      game.instance_variables.each do |var|
+        if request.session[:game]
+          game.instance_variable_set(var,request.session[:game][var]) unless request.session[:game][var].nil?
+        end
+      end
+    end
+
+    def save
+      request.session[:game] ||= {}
+      game.instance_variables.each do |var|
+        request.session[:game][var] = game.instance_variable_get(var)
+      end
+    end
+    
+    def save_game
+      game.save
     end
 
   end

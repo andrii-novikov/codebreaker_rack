@@ -1,9 +1,9 @@
 GIT
   remote: git://github.com/andy1341/codebreaker.git
-  revision: 25129a39382ac095250c85478d8439d613fbb6ec
+  revision: 9e6cfaca28825bb5adf85f3a9cdc6cb7ccbf06f0
   branch: realise
   specs:
-    codebreaker (0.1.4)
+    codebreaker (0.1.6)
 
 GEM
   remote: https://rubygems.org/
